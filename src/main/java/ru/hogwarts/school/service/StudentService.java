@@ -1,6 +1,7 @@
 package ru.hogwarts.school.service;
 
 import org.springframework.stereotype.Service;
+import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.StudentRepository;
 
@@ -20,7 +21,7 @@ public class StudentService {
         return studentRepository.save(student);
     }
 
-    // getStudent должен возвращать Optional<Student>
+
     public Optional<Student> get(Long id) {
         return studentRepository.findById(id);
     }
@@ -36,13 +37,21 @@ public class StudentService {
         studentRepository.deleteById(id);
     }
 
-    // findByAge требует, чтобы вы добавили этот метод в StudentRepository
+
     public List<Student> findByAge(int age) {
         return studentRepository.findByAge(age);
     }
 
     public Collection<Student> getAll() {
         return studentRepository.findAll();
+    }
+
+    public List<Student> findByAgeBetween(int min, int max) {
+        return studentRepository.findByAgeBetween(min, max);
+    }
+
+    public Faculty getFacultyByStudentId(Long id) {
+        return studentRepository.findById(id).map(Student::getFaculty).orElse(null);
     }
 }
 
