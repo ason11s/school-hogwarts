@@ -1,5 +1,7 @@
 package ru.hogwarts.school.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
@@ -25,21 +27,30 @@ public class FacultyController {
     }
 
     @GetMapping("/{id}")
-    public Faculty getFaculty(@PathVariable Long id) {
+    public ResponseEntity<Faculty> getFaculty(@PathVariable Long id) {
         Optional<Faculty> facultyOptional = facultyService.get(id);
-        return facultyOptional.orElse(null); // Возвращаем факультет, если найден, или null
+        if (facultyOptional.isPresent()) {
+            return ResponseEntity.ok(facultyOptional.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping
-    public Faculty updateFaculty(@RequestBody Faculty faculty) {
-        return facultyService.update(faculty);
+    public ResponseEntity<Faculty> updateFaculty(@RequestBody Faculty faculty) {
+        Faculty updatedFaculty = facultyService.update(faculty);
+        if (updatedFaculty != null) {
+            return ResponseEntity.ok(updatedFaculty);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @DeleteMapping("/{id}")
-    public void deleteFaculty(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteFaculty(@PathVariable Long id) {
         facultyService.delete(id);
+        return ResponseEntity.ok().build();
     }
-
 
     @GetMapping
     public Collection<Faculty> getAllFaculties() {
@@ -50,10 +61,12 @@ public class FacultyController {
     public Collection<Faculty> getFacultiesByColor(@RequestParam String color) {
         return facultyService.findByColor(color);
     }
+
     @GetMapping("/find")
     public Collection<Faculty> findByNameOrColor(@RequestParam String query) {
         return facultyService.findByNameOrColor(query);
     }
+
     @GetMapping("/{id}/students")
     public List<Student> getFacultyStudents(@PathVariable Long id) {
         return facultyService.getStudentsByFacultyId(id);
